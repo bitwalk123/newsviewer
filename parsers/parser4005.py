@@ -1,8 +1,9 @@
 from abstract.parser import ParserBase
 
 
-class Parser4005(ParserBase):
+class Parser(ParserBase):
     """住友化学 (4005)"""
+    DISPLAY_NAME = "住友化学 (4005)"
 
     def get_url(self):
         return "https://www.sumitomo-chem.co.jp/news/"

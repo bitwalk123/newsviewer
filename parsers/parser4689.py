@@ -1,8 +1,10 @@
 from abstract.parser import ParserBase
 
 
-class Parser4689(ParserBase):
+class Parser(ParserBase):
     """LINEヤフー (4689)"""
+    DISPLAY_NAME = "LINEヤフー (4689)"
+
 
     def get_url(self):
         return "https://www.lycorp.co.jp/ja/news/"

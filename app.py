@@ -1,6 +1,7 @@
 import sys
 import webbrowser
-from typing import Dict
+import importlib
+import pkgutil
 
 import requests
 from PySide6.QtCore import (
@@ -23,9 +24,9 @@ from PySide6.QtWidgets import (
 )
 from bs4 import BeautifulSoup
 
+# 基底クラスとパッケージをインポート
+import parsers
 from abstract.parser import ParserBase
-from parsers.parser4005 import Parser4005
-from parsers.parser4689 import Parser4689
 
 
 class Fetcher(QThread):
@@ -38,6 +39,7 @@ class Fetcher(QThread):
     def run(self):
         try:
             url = self.parser.get_url()
+            # サイトによってはUser-Agentがないと拒否される場合があるための配慮
             headers = {"User-Agent": "Mozilla/5.0"}
             res = requests.get(url, headers=headers, timeout=10)
 
@@ -45,7 +47,6 @@ class Fetcher(QThread):
             res.raise_for_status()
 
             soup = BeautifulSoup(res.text, "html.parser")
-            # 渡されたパーサーに解析を丸投げ
             results = self.parser.parse(soup)
 
             self.finished.emit(results)
@@ -58,25 +59,20 @@ class NewsViewer(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ニュース・ビューアー")
-        self.resize(800, 600)
-        self.worker = None
+        self.resize(800, 500)
 
-        self.parsers: Dict[str, ParserBase] = {
-            "住友化学 (4005)": Parser4005(),
-            "LINEヤフー (4689)": Parser4689(),
-        }
+        # パーサーの動的ロード
+        self.parsers = self.load_parsers()
 
-        # ツールバー
         self.toolbar = toolbar = QToolBar()
         self.addToolBar(toolbar)
 
-        # 銘柄選択用コンボボックス
+        # ツールバーにコンボボックス追加
         self.combo = combo = QComboBox()
         combo.addItems(self.parsers.keys())
-        combo.currentTextChanged.connect(self.fetch_news)
         toolbar.addWidget(combo)
 
-        # レイアウト
+        # UIレイアウト
         self.base = base = QWidget()
         self.setCentralWidget(base)
         self.layout = layout = QVBoxLayout(base)
@@ -85,23 +81,19 @@ class NewsViewer(QMainWindow):
         self.table = table = QTableWidget(0, 2)
         table.setStyleSheet("QTableWidget {font-family: monospace;}")
         table.setHorizontalHeaderLabels(["日付", "タイトル"])
-        # 行ヘッダー（垂直ヘッダー）を取得して、右寄せ＋垂直中央に設定
-        table.verticalHeader().setDefaultAlignment(
-            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
-        )
-        table.setSelectionBehavior(
-            QAbstractItemView.SelectionBehavior.SelectRows
-        )  # 行選択
-        table.setEditTriggers(
-            QAbstractItemView.EditTrigger.NoEditTriggers
-        )  # 編集禁止
-        table.cellDoubleClicked.connect(self.on_cell_clicked)  # クリックイベント
+
+        # 行番号を右寄せにする
+        table.verticalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+
+        table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        table.cellDoubleClicked.connect(self.on_cell_clicked)
         self.layout.addWidget(table)
 
         # 列の幅調整
         header = table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)  # 日付は内容に合わせる
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)  # タイトルは伸ばす
+        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
 
         # 更新ボタン
         self.btn_refresh = btn_refresh = QPushButton("ニュースを更新")
@@ -109,14 +101,47 @@ class NewsViewer(QMainWindow):
         self.layout.addWidget(btn_refresh)
 
         # 起動時に一度実行
-        self.fetch_news()
+        if self.parsers:
+            self.fetch_news()
+
+    def load_parsers(self):
+        """parsersディレクトリからパーサーを動的に読み込む"""
+        found_parsers = {}
+
+        # parsersパッケージのパス内にあるモジュールを走査
+        for loader, module_name, is_pkg in pkgutil.iter_modules(parsers.__path__):
+            full_module_name = f"parsers.{module_name}"
+            # 動的インポート
+            try:
+                module = importlib.import_module(full_module_name)
+                # 再読み込みが必要な場合（開発中など）に対応
+                importlib.reload(module)
+
+                # モジュール内のクラスを走査
+                for attr_name in dir(module):
+                    attr = getattr(module, attr_name)
+
+                    # ParserBaseを継承し、かつParserBase自身ではない具象クラスを探す
+                    if (isinstance(attr, type) and
+                            issubclass(attr, ParserBase) and
+                            attr is not ParserBase):
+                        # パーサー側で定義した DISPLAY_NAME をキーにする
+                        # 定義がない場合はモジュール名をフォールバックにする
+                        display_name = getattr(attr, "DISPLAY_NAME", module_name)
+                        found_parsers[display_name] = attr()
+            except Exception as e:
+                print(f"Failed to load parser {full_module_name}: {e}")
+
+        return found_parsers
 
     def fetch_news(self):
-        # 選択されている銘柄名を取得
         selected_name = self.combo.currentText()
-        # 対応するパーサーを取り出す
+        if not selected_name:
+            return
+
         parser = self.parsers[selected_name]
-        # スレッドにそのパーサーを託す
+        self.btn_refresh.setEnabled(False)
+
         self.worker = worker = Fetcher(parser)
         worker.finished.connect(self.display_news)
         worker.start()
@@ -127,9 +152,7 @@ class NewsViewer(QMainWindow):
             row = self.table.rowCount()
             self.table.insertRow(row)
 
-            # 日付アイテム
             date_item = QTableWidgetItem(news["date"])
-            # タイトルアイテム（URLをデータとして持たせる）
             title_item = QTableWidgetItem(news["title"])
             title_item.setData(Qt.ItemDataRole.UserRole, news["url"])
 
@@ -139,7 +162,6 @@ class NewsViewer(QMainWindow):
         self.btn_refresh.setEnabled(True)
 
     def on_cell_clicked(self, row, column):
-        # どの列をクリックしてもタイトル列(1)に保存したURLを取得
         url = self.table.item(row, 1).data(Qt.ItemDataRole.UserRole)
         if url:
             webbrowser.open(url)
@@ -147,8 +169,8 @@ class NewsViewer(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
-    win = NewsViewer()
-    win.show()
+    window = NewsViewer()
+    window.show()
     sys.exit(app.exec())
 
 
