@@ -29,6 +29,37 @@ import parsers
 from abstract.parser import ParserBase
 
 
+def load_parsers():
+    """parsersディレクトリからパーサーを動的に読み込む"""
+    found_parsers = {}
+
+    # parsersパッケージのパス内にあるモジュールを走査
+    for loader, module_name, is_pkg in pkgutil.iter_modules(parsers.__path__):
+        full_module_name = f"parsers.{module_name}"
+        # 動的インポート
+        try:
+            module = importlib.import_module(full_module_name)
+            # 再読み込みが必要な場合（開発中など）に対応
+            importlib.reload(module)
+
+            # モジュール内のクラスを走査
+            for attr_name in dir(module):
+                attr = getattr(module, attr_name)
+
+                # ParserBaseを継承し、かつParserBase自身ではない具象クラスを探す
+                if (isinstance(attr, type) and
+                        issubclass(attr, ParserBase) and
+                        attr is not ParserBase):
+                    # パーサー側で定義した DISPLAY_NAME をキーにする
+                    # 定義がない場合はモジュール名をフォールバックにする
+                    display_name = getattr(attr, "DISPLAY_NAME", module_name)
+                    found_parsers[display_name] = attr()
+        except Exception as e:
+            print(f"Failed to load parser {full_module_name}: {e}")
+
+    return found_parsers
+
+
 class Fetcher(QThread):
     finished = Signal(list)
 
@@ -60,9 +91,10 @@ class NewsViewer(QMainWindow):
         super().__init__()
         self.setWindowTitle("ニュース・ビューアー")
         self.resize(800, 500)
+        self.worker = None
 
         # パーサーの動的ロード
-        self.parsers = self.load_parsers()
+        self.parsers = load_parsers()
 
         self.toolbar = toolbar = QToolBar()
         self.addToolBar(toolbar)
@@ -70,6 +102,7 @@ class NewsViewer(QMainWindow):
         # ツールバーにコンボボックス追加
         self.combo = combo = QComboBox()
         combo.addItems(self.parsers.keys())
+        combo.currentTextChanged.connect(self.fetch_news)
         toolbar.addWidget(combo)
 
         # UIレイアウト
@@ -107,36 +140,6 @@ class NewsViewer(QMainWindow):
         # 起動時に一度実行
         if self.parsers:
             self.fetch_news()
-
-    def load_parsers(self):
-        """parsersディレクトリからパーサーを動的に読み込む"""
-        found_parsers = {}
-
-        # parsersパッケージのパス内にあるモジュールを走査
-        for loader, module_name, is_pkg in pkgutil.iter_modules(parsers.__path__):
-            full_module_name = f"parsers.{module_name}"
-            # 動的インポート
-            try:
-                module = importlib.import_module(full_module_name)
-                # 再読み込みが必要な場合（開発中など）に対応
-                importlib.reload(module)
-
-                # モジュール内のクラスを走査
-                for attr_name in dir(module):
-                    attr = getattr(module, attr_name)
-
-                    # ParserBaseを継承し、かつParserBase自身ではない具象クラスを探す
-                    if (isinstance(attr, type) and
-                            issubclass(attr, ParserBase) and
-                            attr is not ParserBase):
-                        # パーサー側で定義した DISPLAY_NAME をキーにする
-                        # 定義がない場合はモジュール名をフォールバックにする
-                        display_name = getattr(attr, "DISPLAY_NAME", module_name)
-                        found_parsers[display_name] = attr()
-            except Exception as e:
-                print(f"Failed to load parser {full_module_name}: {e}")
-
-        return found_parsers
 
     def fetch_news(self):
         selected_name = self.combo.currentText()
