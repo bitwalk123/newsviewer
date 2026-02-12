@@ -1,7 +1,7 @@
-import sys
-import webbrowser
 import importlib
 import pkgutil
+import sys
+import webbrowser
 
 import requests
 from PySide6.QtCore import (
@@ -83,9 +83,13 @@ class NewsViewer(QMainWindow):
         table.setHorizontalHeaderLabels(["日付", "タイトル"])
 
         # 行番号を右寄せにする
-        table.verticalHeader().setDefaultAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
+        table.verticalHeader().setDefaultAlignment(
+            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
+        )
 
-        table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        table.setSelectionBehavior(
+            QAbstractItemView.SelectionBehavior.SelectRows
+        )
         table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         table.cellDoubleClicked.connect(self.on_cell_clicked)
         self.layout.addWidget(table)
