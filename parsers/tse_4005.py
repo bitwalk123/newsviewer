@@ -1,4 +1,6 @@
 from abstract.parser import ParserBase
+from datetime import datetime
+import re
 
 
 class Parser(ParserBase):
@@ -26,9 +28,18 @@ class Parser(ParserBase):
             relative_url = a_tag.get("href")
             full_url = base_url + relative_url if relative_url.startswith("/") else relative_url
 
-            # 日付の取得
+            # 日付の取得と YYYY-MM-DD への変換
             date_el = item.find("p", class_="news-date")
             date_text = date_el.get_text(strip=True) if date_el else ""
+
+            formatted_date = date_text
+            # 数字の塊をリストで取得 (例: "2026年02月05日" -> ["2026", "02", "05"])
+            date_parts = re.findall(r'\d+', date_text)
+            if len(date_parts) == 3:
+                year = date_parts[0]
+                month = date_parts[1].zfill(2)
+                day = date_parts[2].zfill(2)
+                formatted_date = f"{year}-{month}-{day}"
 
             # タイトルの取得
             title_el = item.find("p", class_="news-ttl")
@@ -36,7 +47,7 @@ class Parser(ParserBase):
 
             results.append({
                 "url": full_url,
-                "date": date_text,
+                "date": formatted_date,
                 "title": title_text
             })
         return results
