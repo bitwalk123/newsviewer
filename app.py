@@ -55,9 +55,14 @@ class Fetcher(QThread):
 
 
 class NewsViewer(QMainWindow):
+    __app_name__ = "newsviewer"
+    __version__ = "0.0.1"
+    __author__ = "Fuhito Suguri"
+    __license__ = "MIT"
+
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("ニュース・ビューアー")
+        self.setWindowTitle(f"ニュース・ビューアー {self.__version__}")
         self.resize(800, 500)
         self.worker = None
 
