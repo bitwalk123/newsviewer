@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=ニュース・ビューアー
+Name[en]=NewsViewer
+Comment=株式ニュースのアグリゲーター
+Comment[en]=Stock News Aggregator
+Exec=newsviewer
+Icon=newsviewer
+Terminal=false
+Categories=Office;Finance;Network;
+Keywords=stock;news;finance;
