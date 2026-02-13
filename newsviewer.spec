@@ -1,6 +1,6 @@
 Name:           newsviewer
 Version:        0.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        ニュースビューアー
 
 License:        MIT
@@ -58,5 +58,8 @@ chmod +x %{buildroot}%{_bindir}/%{name}
 %doc README.md
 
 %changelog
+* Sat Feb 14 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.1-2
+- add/modity app icon
+
 * Fri Feb 13 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.1-1
 - initial release
