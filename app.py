@@ -35,13 +35,13 @@ from funcs.utils import open_local_parser_dir
 class Fetcher(QThread):
     finished = Signal(list)
 
-    def __init__(self, parser: ParserBase):
+    def __init__(self, parser: ParserBase) -> None:
         super().__init__()
         self.parser = parser
 
     def run(self):
         try:
-            url = self.parser.get_url()
+            url: str = self.parser.get_url()
             # サイトによってはUser-Agentがないと拒否される場合があるための配慮
             headers = {"User-Agent": "Mozilla/5.0"}
             res = requests.get(url, headers=headers, timeout=10)
@@ -68,7 +68,7 @@ class NewsViewer(QMainWindow):
         super().__init__()
         self.setWindowTitle(f"ニュース・ビューアー {self.__version__}")
         self.resize(800, 500)
-        self.worker = None
+        self.worker: Fetcher | None = None
 
         # パーサーの動的ロード
         self.parsers = load_parsers()
@@ -143,7 +143,7 @@ class NewsViewer(QMainWindow):
         worker.finished.connect(self.display_news)
         worker.start()
 
-    def display_news(self, news_list):
+    def display_news(self, news_list: list):
         self.table.setRowCount(0)
         for news in news_list:
             row = self.table.rowCount()

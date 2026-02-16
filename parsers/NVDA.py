@@ -7,12 +7,12 @@ class Parser(ParserBase):
     """NVIDIA (NVDA)"""
     DISPLAY_NAME = "NVIDIA (NVDA)"
 
-    def get_url(self):
+    def get_url(self) -> str:
         # ニュースルームのトップ（最新ニュース）
         return "https://nvidianews.nvidia.com/"
 
-    def parse(self, soup):
-        results = []
+    def parse(self, soup) -> list[dict[str, str]]:
+        results: list[dict[str, str]] = []
 
         # ニュース項目を保持する <article class="tiles-item"> をすべて取得
         articles = soup.find_all("article", class_=lambda x: x and 'tiles-item' in x)
