@@ -60,7 +60,7 @@ class Fetcher(QThread):
 
 class NewsViewer(QMainWindow):
     __app_name__ = "newsviewer"
-    __version__ = "0.0.2"
+    __version__ = "0.0.3"
     __author__ = "Fuhito Suguri"
     __license__ = "MIT"
 

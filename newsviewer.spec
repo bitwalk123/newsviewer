@@ -61,6 +61,9 @@ chmod +x %{buildroot}%{_bindir}/%{name}
 %doc README.md
 
 %changelog
+* ### ### ## 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.3-1
+- upgrade to 0.0.3
+
 * Mon Feb 16 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.2-1
 - upgrade to 0.0.2
 
