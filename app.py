@@ -37,20 +37,20 @@ class Fetcher(QThread):
 
     def __init__(self, parser: ParserBase) -> None:
         super().__init__()
-        self.parser = parser
+        self.parser: ParserBase = parser
 
-    def run(self):
+    def run(self) -> None:
         try:
             url: str = self.parser.get_url()
             # サイトによってはUser-Agentがないと拒否される場合があるための配慮
-            headers = {"User-Agent": "Mozilla/5.0"}
+            headers: dict[str, str] = {"User-Agent": "Mozilla/5.0"}
             res = requests.get(url, headers=headers, timeout=10)
 
             res.encoding = res.apparent_encoding
             res.raise_for_status()
 
             soup = BeautifulSoup(res.text, "html.parser")
-            results = self.parser.parse(soup)
+            results: list[dict[str, str]] = self.parser.parse(soup)
 
             self.finished.emit(results)
         except Exception as e:
@@ -64,14 +64,14 @@ class NewsViewer(QMainWindow):
     __author__ = "Fuhito Suguri"
     __license__ = "MIT"
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle(f"ニュース・ビューアー {self.__version__}")
         self.resize(800, 500)
         self.worker: Fetcher | None = None
 
         # パーサーの動的ロード
-        self.parsers = load_parsers()
+        self.parsers: dict[str, ParserBase] = load_parsers()
 
         # ウィンドウアイコンの設定
         self.setWindowIcon(get_app_icon())
@@ -81,7 +81,7 @@ class NewsViewer(QMainWindow):
 
         # ツールバーにコンボボックス追加
         self.combo = combo = QComboBox()
-        combo.addItems(self.parsers.keys())
+        combo.addItems(list(self.parsers.keys()))
         combo.currentTextChanged.connect(self.fetch_news)
         toolbar.addWidget(combo)
 
@@ -131,7 +131,7 @@ class NewsViewer(QMainWindow):
         if self.parsers:
             self.fetch_news()
 
-    def fetch_news(self):
+    def fetch_news(self) -> None:
         selected_name = self.combo.currentText()
         if not selected_name:
             return
@@ -143,7 +143,7 @@ class NewsViewer(QMainWindow):
         worker.finished.connect(self.display_news)
         worker.start()
 
-    def display_news(self, news_list: list):
+    def display_news(self, news_list) -> None:
         self.table.setRowCount(0)
         for news in news_list:
             row = self.table.rowCount()
@@ -158,13 +158,15 @@ class NewsViewer(QMainWindow):
 
         self.btn_refresh.setEnabled(True)
 
-    def on_cell_clicked(self, row, column):
-        url = self.table.item(row, 1).data(Qt.ItemDataRole.UserRole)
-        if url:
-            webbrowser.open(url)
+    def on_cell_clicked(self, row: int, column: int) -> None:
+        item: QTableWidgetItem | None = self.table.item(row, 1)
+        if item:
+            url: str | None = item.data(Qt.ItemDataRole.UserRole)
+            if url:
+                webbrowser.open(url)
 
 
-def main():
+def main() -> None:
     app = QApplication(sys.argv)
     window = NewsViewer()
     window.show()
