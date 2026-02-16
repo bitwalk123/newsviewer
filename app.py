@@ -7,6 +7,7 @@ from PySide6.QtCore import (
     QThread,
     Signal,
 )
+from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -14,6 +15,8 @@ from PySide6.QtWidgets import (
     QHeaderView,
     QMainWindow,
     QPushButton,
+    QSizePolicy,
+    QStyle,
     QTableWidget,
     QTableWidgetItem,
     QToolBar,
@@ -26,6 +29,7 @@ from bs4 import BeautifulSoup
 from abstract.parser import ParserBase
 from funcs.plugin_loader import load_parsers
 from funcs.assets import get_app_icon
+from funcs.utils import open_local_parser_dir
 
 
 class Fetcher(QThread):
@@ -56,7 +60,7 @@ class Fetcher(QThread):
 
 class NewsViewer(QMainWindow):
     __app_name__ = "newsviewer"
-    __version__ = "0.0.1"
+    __version__ = "0.0.2"
     __author__ = "Fuhito Suguri"
     __license__ = "MIT"
 
@@ -80,6 +84,16 @@ class NewsViewer(QMainWindow):
         combo.addItems(self.parsers.keys())
         combo.currentTextChanged.connect(self.fetch_news)
         toolbar.addWidget(combo)
+
+        pad = QWidget()
+        pad.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        toolbar.addWidget(pad)
+
+        # Open
+        icon_open = self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon)
+        self.action_open = action_open = QAction(icon_open, "ローカルパーサー保管場所", self)
+        action_open.triggered.connect(open_local_parser_dir)
+        toolbar.addAction(action_open)
 
         # UIレイアウト
         self.base = base = QWidget()

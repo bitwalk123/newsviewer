@@ -1,6 +1,6 @@
 Name:           newsviewer
-Version:        0.0.1
-Release:        2%{?dist}
+Version:        0.0.2
+Release:        1%{?dist}
 Summary:        ニュースビューアー
 
 License:        MIT
@@ -32,7 +32,10 @@ mkdir -p %{buildroot}%{_datadir}/applications
 # 2. Pythonソースの配置 (ライブラリディレクトリ)
 cp app.py %{buildroot}%{_libdir}/%{name}/
 cp abstract/parser.py %{buildroot}%{_libdir}/%{name}/abstract/
-cp funcs/*.py %{buildroot}%{_libdir}/%{name}/funcs/
+cp funcs/assets.py %{buildroot}%{_libdir}/%{name}/funcs/
+cp funcs/conv_locale.py %{buildroot}%{_libdir}/%{name}/funcs/
+cp funcs/plugin_loader.py %{buildroot}%{_libdir}/%{name}/funcs/
+cp funcs/utils.py %{buildroot}%{_libdir}/%{name}/funcs/
 cp parsers/NVDA.py %{buildroot}%{_libdir}/%{name}/parsers/
 cp parsers/tse_7203.py %{buildroot}%{_libdir}/%{name}/parsers/
 
@@ -58,6 +61,9 @@ chmod +x %{buildroot}%{_bindir}/%{name}
 %doc README.md
 
 %changelog
+* Mon Feb 16 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.2-1
+- upgrade to 0.0.2
+
 * Sat Feb 14 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.1-2
 - add/modity app icon
 
