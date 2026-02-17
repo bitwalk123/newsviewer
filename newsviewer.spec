@@ -36,6 +36,8 @@ cp funcs/assets.py %{buildroot}%{_libdir}/%{name}/funcs/
 cp funcs/conv_locale.py %{buildroot}%{_libdir}/%{name}/funcs/
 cp funcs/plugin_loader.py %{buildroot}%{_libdir}/%{name}/funcs/
 cp funcs/utils.py %{buildroot}%{_libdir}/%{name}/funcs/
+cp modules/fetcher.py %{buildroot}%{_libdir}/%{name}/modules/
+cp modules/newsviewer.py %{buildroot}%{_libdir}/%{name}/modules/
 cp parsers/NVDA.py %{buildroot}%{_libdir}/%{name}/parsers/
 cp parsers/tse_7203.py %{buildroot}%{_libdir}/%{name}/parsers/
 cp widgets/buttons.py %{buildroot}%{_libdir}/%{name}/widgets/
