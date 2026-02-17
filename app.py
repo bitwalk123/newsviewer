@@ -4,6 +4,7 @@ import webbrowser
 import requests
 from PySide6.QtCore import (
     Qt,
+    QMargins,
     QThread,
     Signal,
 )
@@ -67,6 +68,7 @@ class NewsViewer(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle(f"ニュース・ビューアー {self.__version__}")
+        self.setContentsMargins(QMargins(0, 0, 0, 0))
         self.resize(800, 500)
         self.worker: Fetcher | None = None
 
@@ -77,10 +79,13 @@ class NewsViewer(QMainWindow):
         self.setWindowIcon(get_app_icon())
 
         self.toolbar = toolbar = QToolBar()
+        toolbar.setContentsMargins(QMargins(0, 0, 0, 0))
         self.addToolBar(toolbar)
 
         # ツールバーにコンボボックス追加
         self.combo = combo = QComboBox()
+        combo.setContentsMargins(QMargins(0, 0, 0, 0))
+        combo.setStyleSheet("QComboBox {font-family: monospace;}")
         combo.addItems(list(self.parsers.keys()))
         combo.currentTextChanged.connect(self.fetch_news)
         toolbar.addWidget(combo)
@@ -97,12 +102,31 @@ class NewsViewer(QMainWindow):
 
         # UIレイアウト
         self.base = base = QWidget()
+        base.setContentsMargins(QMargins(0, 0, 0, 0))
         self.setCentralWidget(base)
-        self.layout = layout = QVBoxLayout(base)
+
+        self.layout = layout = QVBoxLayout()
+        layout.setContentsMargins(QMargins(0, 0, 0, 0))
+        layout.setSpacing(0)
+        base.setLayout(layout)
 
         # テーブルの設定
         self.table = table = QTableWidget(0, 2)
-        table.setStyleSheet("QTableWidget {font-family: monospace;}")
+        table.setContentsMargins(QMargins(0, 0, 0, 0))
+        table.setAlternatingRowColors(True)
+        table.setStyleSheet("""
+            QTableWidget {
+                font-family: monospace;
+            }
+            QHeaderView::section:horizontal {
+                font-family: monospace;
+            }
+            QHeaderView::section:vertical {
+                font-family: monospace;
+                margin-left: 0.3em;
+                margin-right: 0.3em;
+            }
+        """)
         table.setHorizontalHeaderLabels(["日付", "タイトル"])
 
         # 行番号を右寄せにする
@@ -113,9 +137,10 @@ class NewsViewer(QMainWindow):
         table.setSelectionBehavior(
             QAbstractItemView.SelectionBehavior.SelectRows
         )
+
         table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         table.cellDoubleClicked.connect(self.on_cell_clicked)
-        self.layout.addWidget(table)
+        layout.addWidget(table)
 
         # 列の幅調整
         header = table.horizontalHeader()
@@ -124,8 +149,10 @@ class NewsViewer(QMainWindow):
 
         # 更新ボタン
         self.btn_refresh = btn_refresh = QPushButton("ニュースを更新")
+        btn_refresh.setContentsMargins(QMargins(0, 0, 0, 0))
+        btn_refresh.setStyleSheet("QPushButton {font-family: monospace;}")
         btn_refresh.clicked.connect(self.fetch_news)
-        self.layout.addWidget(btn_refresh)
+        layout.addWidget(btn_refresh)
 
         # 起動時に一度実行
         if self.parsers:
