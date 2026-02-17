@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, QMargins
-from PySide6.QtWidgets import QTableWidget, QAbstractItemView, QHeaderView
+from PySide6.QtWidgets import QTableWidget, QAbstractItemView, QHeaderView, QTableWidgetItem
 
 
 class TableWidget(QTableWidget):
@@ -37,3 +37,16 @@ class TableWidget(QTableWidget):
         header = self.horizontalHeader()
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
+
+    def setNews(self, news_list: list[dict[str, str]]) -> None:
+        self.setRowCount(0)
+        for news in news_list:
+            row = self.rowCount()
+            self.insertRow(row)
+
+            date_item = QTableWidgetItem(news["date"])
+            title_item = QTableWidgetItem(news["title"])
+            title_item.setData(Qt.ItemDataRole.UserRole, news["url"])
+
+            self.setItem(row, 0, date_item)
+            self.setItem(row, 1, title_item)

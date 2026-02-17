@@ -94,8 +94,7 @@ class NewsViewer(MainWindow):
         layout.addWidget(table)
 
         # 更新ボタン
-        self.btn_refresh = btn_refresh = Button()
-        btn_refresh.setText("ニュースを更新")
+        self.btn_refresh = btn_refresh = Button("ニュースを更新")
         btn_refresh.clicked.connect(self.fetch_news)
         layout.addWidget(btn_refresh)
 
@@ -116,18 +115,7 @@ class NewsViewer(MainWindow):
         worker.start()
 
     def display_news(self, news_list) -> None:
-        self.table.setRowCount(0)
-        for news in news_list:
-            row = self.table.rowCount()
-            self.table.insertRow(row)
-
-            date_item = QTableWidgetItem(news["date"])
-            title_item = QTableWidgetItem(news["title"])
-            title_item.setData(Qt.ItemDataRole.UserRole, news["url"])
-
-            self.table.setItem(row, 0, date_item)
-            self.table.setItem(row, 1, title_item)
-
+        self.table.setNews(news_list)
         self.btn_refresh.setEnabled(True)
 
     def on_cell_clicked(self, row: int, column: int) -> None:

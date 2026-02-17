@@ -12,7 +12,7 @@ class ActionFolder(QAction):
 
 
 class Button(QPushButton):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, text: str):
+        super().__init__(text)
         self.setContentsMargins(QMargins(0, 0, 0, 0))
         self.setStyleSheet("QPushButton {font-family: monospace;}")
