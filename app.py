@@ -8,21 +8,10 @@ from PySide6.QtCore import (
     QThread,
     Signal,
 )
-from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (
-    QAbstractItemView,
     QApplication,
-    QComboBox,
-    QHeaderView,
     QMainWindow,
-    QPushButton,
-    QSizePolicy,
-    QStyle,
-    QTableWidget,
     QTableWidgetItem,
-    QToolBar,
-    QVBoxLayout,
-    QWidget,
 )
 from bs4 import BeautifulSoup
 
@@ -31,6 +20,12 @@ from abstract.parser import ParserBase
 from funcs.plugin_loader import load_parsers
 from funcs.assets import get_app_icon
 from funcs.utils import open_local_parser_dir
+from widgets.buttons import Button, ActionFolder
+from widgets.combos import ComboBox
+from widgets.containers import PadH, Widget
+from widgets.layouts import VBoxLayout
+from widgets.tables import TableWidget
+from widgets.toolbars import ToolBar
 
 
 class Fetcher(QThread):
@@ -78,79 +73,38 @@ class NewsViewer(QMainWindow):
         # ウィンドウアイコンの設定
         self.setWindowIcon(get_app_icon())
 
-        self.toolbar = toolbar = QToolBar()
-        toolbar.setContentsMargins(QMargins(0, 0, 0, 0))
+        toolbar = ToolBar()
         self.addToolBar(toolbar)
 
         # ツールバーにコンボボックス追加
-        self.combo = combo = QComboBox()
-        combo.setContentsMargins(QMargins(0, 0, 0, 0))
-        combo.setStyleSheet("QComboBox {font-family: monospace;}")
+        self.combo = combo = ComboBox()
         combo.addItems(list(self.parsers.keys()))
         combo.currentTextChanged.connect(self.fetch_news)
         toolbar.addWidget(combo)
 
-        pad = QWidget()
-        pad.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Preferred)
+        pad = PadH()
         toolbar.addWidget(pad)
 
         # Open
-        icon_open = self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon)
-        self.action_open = action_open = QAction(icon_open, "ローカルパーサー保管場所", self)
+        action_open = ActionFolder(self)
         action_open.triggered.connect(open_local_parser_dir)
         toolbar.addAction(action_open)
 
         # UIレイアウト
-        self.base = base = QWidget()
-        base.setContentsMargins(QMargins(0, 0, 0, 0))
+        base = Widget()
         self.setCentralWidget(base)
 
-        self.layout = layout = QVBoxLayout()
-        layout.setContentsMargins(QMargins(0, 0, 0, 0))
-        layout.setSpacing(0)
+        layout = VBoxLayout()
         base.setLayout(layout)
 
         # テーブルの設定
-        self.table = table = QTableWidget(0, 2)
-        table.setContentsMargins(QMargins(0, 0, 0, 0))
-        table.setAlternatingRowColors(True)
-        table.setStyleSheet("""
-            QTableWidget {
-                font-family: monospace;
-            }
-            QHeaderView::section:horizontal {
-                font-family: monospace;
-            }
-            QHeaderView::section:vertical {
-                font-family: monospace;
-                margin-left: 0.3em;
-                margin-right: 0.3em;
-            }
-        """)
-        table.setHorizontalHeaderLabels(["日付", "タイトル"])
-
-        # 行番号を右寄せにする
-        table.verticalHeader().setDefaultAlignment(
-            Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter
-        )
-
-        table.setSelectionBehavior(
-            QAbstractItemView.SelectionBehavior.SelectRows
-        )
-
-        table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self.table = table = TableWidget(0, 2)
         table.cellDoubleClicked.connect(self.on_cell_clicked)
         layout.addWidget(table)
 
-        # 列の幅調整
-        header = table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Stretch)
-
         # 更新ボタン
-        self.btn_refresh = btn_refresh = QPushButton("ニュースを更新")
-        btn_refresh.setContentsMargins(QMargins(0, 0, 0, 0))
-        btn_refresh.setStyleSheet("QPushButton {font-family: monospace;}")
+        self.btn_refresh = btn_refresh = Button()
+        btn_refresh.setText("ニュースを更新")
         btn_refresh.clicked.connect(self.fetch_news)
         layout.addWidget(btn_refresh)
 
