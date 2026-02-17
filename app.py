@@ -2,11 +2,7 @@ import sys
 import webbrowser
 
 import requests
-from PySide6.QtCore import (
-    Qt,
-    QThread,
-    Signal,
-)
+from PySide6.QtCore import Qt, QThread, Signal
 from PySide6.QtWidgets import QApplication, QTableWidgetItem
 
 from bs4 import BeautifulSoup
