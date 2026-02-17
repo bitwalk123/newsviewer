@@ -4,15 +4,11 @@ import webbrowser
 import requests
 from PySide6.QtCore import (
     Qt,
-    QMargins,
     QThread,
     Signal,
 )
-from PySide6.QtWidgets import (
-    QApplication,
-    QMainWindow,
-    QTableWidgetItem,
-)
+from PySide6.QtWidgets import QApplication, QTableWidgetItem
+
 from bs4 import BeautifulSoup
 
 # 基底クラスとパッケージをインポート
@@ -22,7 +18,7 @@ from funcs.assets import get_app_icon
 from funcs.utils import open_local_parser_dir
 from widgets.buttons import Button, ActionFolder
 from widgets.combos import ComboBox
-from widgets.containers import PadH, Widget
+from widgets.containers import PadH, Widget, MainWindow
 from widgets.layouts import VBoxLayout
 from widgets.tables import TableWidget
 from widgets.toolbars import ToolBar
@@ -54,7 +50,7 @@ class Fetcher(QThread):
             self.finished.emit([])
 
 
-class NewsViewer(QMainWindow):
+class NewsViewer(MainWindow):
     __app_name__ = "newsviewer"
     __version__ = "0.0.3"
     __author__ = "Fuhito Suguri"
@@ -63,7 +59,6 @@ class NewsViewer(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         self.setWindowTitle(f"ニュース・ビューアー {self.__version__}")
-        self.setContentsMargins(QMargins(0, 0, 0, 0))
         self.resize(800, 500)
         self.worker: Fetcher | None = None
 
