@@ -1,5 +1,5 @@
 Name:           newsviewer
-Version:        0.0.2
+Version:        0.0.3
 Release:        1%{?dist}
 Summary:        ニュースビューアー
 
@@ -26,6 +26,7 @@ mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_libdir}/%{name}/abstract
 mkdir -p %{buildroot}%{_libdir}/%{name}/funcs
 mkdir -p %{buildroot}%{_libdir}/%{name}/parsers
+mkdir -p %{buildroot}%{_libdir}/%{name}/widgets
 mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
 mkdir -p %{buildroot}%{_datadir}/applications
 
@@ -36,8 +37,16 @@ cp funcs/assets.py %{buildroot}%{_libdir}/%{name}/funcs/
 cp funcs/conv_locale.py %{buildroot}%{_libdir}/%{name}/funcs/
 cp funcs/plugin_loader.py %{buildroot}%{_libdir}/%{name}/funcs/
 cp funcs/utils.py %{buildroot}%{_libdir}/%{name}/funcs/
+cp modules/fetcher.py %{buildroot}%{_libdir}/%{name}/modules/
+cp modules/newsviewer.py %{buildroot}%{_libdir}/%{name}/modules/
 cp parsers/NVDA.py %{buildroot}%{_libdir}/%{name}/parsers/
 cp parsers/tse_7203.py %{buildroot}%{_libdir}/%{name}/parsers/
+cp widgets/buttons.py %{buildroot}%{_libdir}/%{name}/widgets/
+cp widgets/combos.py %{buildroot}%{_libdir}/%{name}/widgets/
+cp widgets/containers.py %{buildroot}%{_libdir}/%{name}/widgets/
+cp widgets/layouts.py %{buildroot}%{_libdir}/%{name}/widgets/
+cp widgets/tables.py %{buildroot}%{_libdir}/%{name}/widgets/
+cp widgets/toolbars.py %{buildroot}%{_libdir}/%{name}/widgets/
 
 # 3. リソースファイルの配置
 cp resources/icons/newsviewer.svg %{buildroot}%{_datadir}/icons/hicolor/scalable/apps/
@@ -61,8 +70,11 @@ chmod +x %{buildroot}%{_bindir}/%{name}
 %doc README.md
 
 %changelog
+* Wed Feb 18 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.3-1
+- update to 0.0.3
+
 * Mon Feb 16 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.2-1
-- upgrade to 0.0.2
+- update to 0.0.2
 
 * Sat Feb 14 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.1-2
 - add/modity app icon

@@ -6,13 +6,13 @@ class Parser(ParserBase):
     """トヨタ自動車 (7203)"""
     DISPLAY_NAME = "トヨタ自動車 (7203)"
 
-    def get_url(self):
+    def get_url(self) -> str:
         # 投資家情報 (IR) ページ
         return "https://global.toyota/jp/ir/"
 
-    def parse(self, soup):
-        base_url = "https://global.toyota"
-        results = []
+    def parse(self, soup) -> list[dict[str, str]]:
+        base_url: str = "https://global.toyota"
+        results: list[dict[str, str]] = []
 
         # <ul class="news_contents"> 内の <li> をすべて取得
         news_list = soup.find("ul", class_="news_contents")
