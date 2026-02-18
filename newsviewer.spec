@@ -25,6 +25,7 @@ PySide6を使用した、東証および米国株の銘柄の会社サイトの�
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_libdir}/%{name}/abstract
 mkdir -p %{buildroot}%{_libdir}/%{name}/funcs
+mkdir -p %{buildroot}%{_libdir}/%{name}/modules
 mkdir -p %{buildroot}%{_libdir}/%{name}/parsers
 mkdir -p %{buildroot}%{_libdir}/%{name}/widgets
 mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
