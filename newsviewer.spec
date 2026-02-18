@@ -1,5 +1,5 @@
 Name:           newsviewer
-Version:        0.0.3
+Version:        0.0.4
 Release:        1%{?dist}
 Summary:        ニュースビューアー
 
@@ -71,6 +71,9 @@ chmod +x %{buildroot}%{_bindir}/%{name}
 %doc README.md
 
 %changelog
+* ### ### ## #### Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.4-1
+- update to 0.0.4
+
 * Wed Feb 18 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.3-1
 - update to 0.0.3
 

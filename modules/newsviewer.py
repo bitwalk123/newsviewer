@@ -18,7 +18,7 @@ from widgets.toolbars import ToolBar
 
 class NewsViewer(MainWindow):
     __app_name__ = "newsviewer"
-    __version__ = "0.0.3"
+    __version__ = "0.0.4"
     __author__ = "Fuhito Suguri"
     __license__ = "MIT"
 
@@ -34,6 +34,7 @@ class NewsViewer(MainWindow):
         # ウィンドウアイコンの設定
         self.setWindowIcon(get_app_icon())
 
+        # ツールバー
         toolbar = ToolBar()
         self.addToolBar(toolbar)
 
@@ -46,7 +47,7 @@ class NewsViewer(MainWindow):
         pad = PadH()
         toolbar.addWidget(pad)
 
-        # Open
+        # ユーザー定義パーサーのローカル保存場所を開くアイコン
         action_open = ActionFolder(self)
         action_open.triggered.connect(open_local_parser_dir)
         toolbar.addAction(action_open)
