@@ -1,5 +1,5 @@
 Name:           newsviewer
-Version:        0.0.2
+Version:        0.0.3
 Release:        1%{?dist}
 Summary:        ニュースビューアー
 
@@ -26,6 +26,7 @@ mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_libdir}/%{name}/abstract
 mkdir -p %{buildroot}%{_libdir}/%{name}/funcs
 mkdir -p %{buildroot}%{_libdir}/%{name}/parsers
+mkdir -p %{buildroot}%{_libdir}/%{name}/widgets
 mkdir -p %{buildroot}%{_datadir}/icons/hicolor/scalable/apps
 mkdir -p %{buildroot}%{_datadir}/applications
 
@@ -69,11 +70,11 @@ chmod +x %{buildroot}%{_bindir}/%{name}
 %doc README.md
 
 %changelog
-* ### ### ## 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.3-1
-- upgrade to 0.0.3
+* Wed Feb 18 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.3-1
+- update to 0.0.3
 
 * Mon Feb 16 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.2-1
-- upgrade to 0.0.2
+- update to 0.0.2
 
 * Sat Feb 14 2026 Fuhito Suguri <bitwalk123@users.noreply.github.com> - 0.0.1-2
 - add/modity app icon
